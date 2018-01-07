@@ -1,5 +1,11 @@
+#include<iostream>
+#include<queue>
+using namespace std;
+
 // NOT BEING USED ATM, i just forced it lol
 int create_index; // will use to move index of array being used to store each element. should probably do this using malloc in c++. or maybe now its time i learn java. 
+
+queue<int> q; 
 
 
 int x_max; 
@@ -40,8 +46,10 @@ element start[9];
 int find_element(int given_x, int given_y){
     int i = 0; 
     for (i = 0; i < sizeof(start); i++){
-        if (start[i].x == given_x && start[i].y == given_y)
-            return start[i].id; 
+        if (start[i] != NULL){
+            if (start[i].x == given_x && start[i].y == given_y)
+                return start[i].id;
+        } 
     }
     return -1; 
 }
@@ -118,7 +126,7 @@ element create_normal(int normal_x, int normal_y, int item_id) {
     return new_element; 
 }
 
-void redo_board(element_todo){
+void redo_board(element element_todo){
     // Person has pressed on this element, error checking happens elsewhere. 
 
     //Three subcases depending on position 
@@ -132,30 +140,55 @@ void redo_board(element_todo){
 
    else{ // explode. 
             if (element_todo.up_id != -1){
-                enqueue(element_todo.up_id); 
+                q.push(element_todo.up_id); 
             }
             if (element_todo.down_id != -1){
-                enqueue(element_todo.down_id); 
+                q.push(element_todo.down_id); 
             }
             if (element_todo.left_id != -1){
-                enqueue(element_todo.left_id); 
+                q.push(element_todo.left_id); 
             }
             if (element_todo.right_id != -1){
-                enqueue(element_todo.right_id); 
+                q.push(element_todo.right_id); 
             }
 
-            //update_remaining_processes(element_todo.player_id); 
        }
 }
 
 
-// NEED TO WRITE UPDATE_BOARD && ENQUEUE
-
-void update_remaining_processes(change_player_id) {
+void update_remaining_processes(int change_player_id) {
     // pseudo code --> 
-    1. Go through all items in the queue, and change the player_id to the one given here. 
-    2. Call redo_board on each of those processes. 
-    3. Note that the queue size should be the same as the number of total elements. 
+    while(!q.empty()){
+        int index = q.pop(); 
+        element temp = start[index]; 
+        temp.player_id = change_player_id; 
+        redo_board(temp); 
+    }
+}
+
+void user_input() {
+    int global_player = 2; 
+    int input; 
+    while (1){
+
+        /*Player switching, looking into mod for multi players*/
+        if (global_player == 1)
+            global_player == 2;
+        else 
+            global_player == 1; 
+
+        cin >> input; 
+
+        if (input < 0)
+            break; 
+        
+        element to_use = start[input]; 
+        q.push(to_use); 
+        update_remaining_processes(global_player); 
+
+    }
+
+
 }
 
 int main() {
@@ -176,6 +209,8 @@ int main() {
     x_max = 2; 
     y_max = 2; 
 
-	printf("Compile testing"); 
+	cout << "Compile testing"; 
+
+    user_input(); 
 	return 0; 
 }
